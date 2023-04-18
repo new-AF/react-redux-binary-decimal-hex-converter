@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>
+		app Unsigned Binary-Decimal Converter
+	</title>
+	
+	<!-- https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js -->
+	<script src="./libraries/babel.min.js"></script>
+	
+	<!-- https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/cjs/react.development.js -->
+	<script src="./libraries/react.development.js"></script>
+	
+	<!-- https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.min.js -->
+	<script src="./libraries/react-dom.development.js"></script>
+	
+	<!-- redux https://unpkg.com/redux@4.2.0/dist/redux.js -->
+	<script src="./libraries/redux.js"></script>
+	
+	<!-- react-redux https://cdnjs.cloudflare.com/ajax/libs/react-redux/8.0.5/react-redux.js -->
+	<script src="./libraries/react-redux.js"></script>
+	
+	<!-- font awesome icons -->
+	<link href='./libraries/css/all.css' rel='stylesheet'>
+	
+	<link href='styles.css' rel='stylesheet'>
+</head>
+
+<body>
+	<header>
+		<h1>
+			Unsigned Binary number to Decimal number converter
+		</h1>
+	</header>
+	<main>
+		<div id="react-container">
+		
+		<div>
+	</main>
+	
+	<script type="text/babel">
+		//------- component App WITHOUT LOCAL STATE -------//
+
+		const state0= {
+			binaryText: '',
+			decimalText: '',
+			binaryTextLength: '',
+			decimalTextLength: ''
+		}
+
+		/* validate textarea */
+		/* both accept empty string as valid input*/
+		const isBinaryString= string=> /^[01]*$/.test(string);
+		const isDecimalString= string=> /^\d*$/.test(string);
+
+		const rootReducer=(state= {...state0}, action)=> {
+			const {type}= action;
+
+			const EMPTY_STRING_INPUT= '';
+
+			if(type==='inputBinary'){
+				const {text}= action;
+
+				/* ignore invalid input */
+				if(isBinaryString(text) === false){
+					return state;
+				}
+
+				if(text === EMPTY_STRING_INPUT){
+					return {
+						...state,
+						binaryText: EMPTY_STRING_INPUT,
+						decimalText: EMPTY_STRING_INPUT,
+						binaryTextLength: EMPTY_STRING_INPUT,
+						decimalTextLength: EMPTY_STRING_INPUT,
+					}
+				}
+
+				/*Binary to Decimal*/
+
+				const getdecimal= string=>{
+					
+					//const pow= Math.pow; //not needed bec. ** operator
+
+					
+					
+					/*
+					avoid stack overflow of [...string0] when
+					string0 is too big;
+
+					instead using below trick
+
+					if a string is 100 with indicies 012 then
+					length-1-index is 210 
+					*/
+					//const string= [...string0].reverse().join('');
+					const lengthMinus1= BigInt(string.length) - BigInt(1);
+					
+					const dec= Array.from(string).reduce((acc, oldElement, oldIndex)=> {
+						
+						const zeroOrOne= BigInt(oldElement);// 0 or 1
+						const index= lengthMinus1 - BigInt(oldIndex);
+						const powerValue= BigInt(2) ** index;
+						
+						const result= acc + zeroOrOne * powerValue;
+
+						//console.log('--result=', result, 'typeof result=', typeof result);
+
+						return result;
+
+					}, BigInt(0) );
+			
+					return dec;
+				};
+
+				const dec= getdecimal(text).toString();
+				
+
+				//console.log('---', text);
+				return {
+					...state,
+					binaryText: text,
+					decimalText: dec,
+					binaryTextLength: `${text.length} bits long`,
+					decimalTextLength: `${dec.length} digits long`,
+				};
+			}
+			else if(type==='inputDecimal'){
+				const {text}= action;
+
+				/* ignore invalid input */
+				if(isDecimalString(text) === false){
+					return state;
+				}
+
+				/*
+				Decimal to Binary
+				using the repeated division by 2 algorithm
+				*/
+				
+				/*
+				version 1; prepend array;
+					attach remainer value to front of array;
+					use array.unshift(r)
+				*/
+				const getBinaryNumberV1= (decimalString)=> {
+					/*division remainers*/
+					const array= [];
+
+					/*quotient mutated*/
+					let i= BigInt(decimalString);
+					
+
+					/*stop when quotient = 0*/
+					while ( i != BigInt(0) ){
+						
+						/* for BigInt; / operator is integer division? */
+						const [q, r]= [ i / BigInt(2), i % BigInt(2) ];
+						i= q;
+
+						//console.log('--q=', q, 'typeof q=', typeof q, 'r=', r, 'typeof r', typeof r);
+
+
+						/*prepend remainder*/
+						array.unshift(r);
+					}
+					
+					// join the array of BigInt 0 or 1 values;
+					const string= array.join('');
+
+					return string;
+				}
+
+				/*
+				version 2; preallocate the remainers array;
+					then simply set its positions with values
+				*/
+				const getBinaryNumberV2= (decimalString)=> {
+					/*
+					how wide should the array be?
+					
+					floor(log2(decimalNumber)) + 1
+					
+					*/
+					
+
+				}
+
+				const bin= getBinaryNumberV1(text);
+
+				//console.log('---', text);
+				return {
+					...state,
+					binaryText: bin,
+					decimalText: text,
+					binaryTextLength: `${bin.length} bits long`,
+					decimalTextLength: `${text.length} digits long`,
+				};
+			}
+			else if(type==='clear-binary' || type==='clear-decimal'){
+				return {
+					...state,
+					binaryText: EMPTY_STRING_INPUT,
+					decimalText: EMPTY_STRING_INPUT,
+					binaryTextLength: EMPTY_STRING_INPUT,
+					decimalTextLength: EMPTY_STRING_INPUT,
+				}
+			}
+			else{
+				return {...state};
+			}
+		};
+		
+		//-------  map state to props ------- //
+		const mapStateToProps= state=>state;
+
+		//-------  map dispat=ch to props ------- //
+		const mapDispatchToProps= dispatchFunction=>({
+			'do-onInputBinary': event=> dispatchFunction({type: 'inputBinary', text: event.target.value}),
+			'do-onInputDecimal': event=> dispatchFunction({type: 'inputDecimal', text: event.target.value}),
+			
+			/* set initial decimal value*/
+			'do-initial-onInputDecimal': string=> dispatchFunction({type: 'inputDecimal', text: string}),
+
+			'do-clear-binary': event=> dispatchFunction({type: 'clear-binary'}),
+			'do-clear-decimal': event=> dispatchFunction({type: 'clear-decimal'}),
+		});
+		//-------  components ------- //
+		const ErorrMessage= (props)=>{
+			const {
+
+				classNames,
+				imgPaths,
+				idNames
+			}= props;
+
+			const {
+				'panel': errorClassName,
+				'button': buttonClassName
+			}= classNames;
+
+			return <section className={errorClassName}>
+				<h2>Invalid Input</h2>
+				<p>Invalid Input</p>
+
+				<button className={buttonClassName}>Close</button>
+			</section>;
+		}
+
+		const Panel= (props)=>{
+			const {
+				onInput,
+				clearCallback,
+
+				classNames,
+				imgPaths,
+				idNames,
+
+				label,
+
+				subscript,
+				
+				/*conversion and user input text*/
+				value,
+
+				/*ength of conversion and user input text*/
+				lengthText
+		}= props;
+
+			const {
+				panel: panelClassName,
+				label: labelClassName,
+
+				'hr-right': hrRightClassName,
+				'hr-left': hrLeftClassName,
+
+				lengthTextParent: lengthTextParentClassName,
+				lengthText: lengthTextClassName,
+
+				input: inputClassName,
+				subscript: subscriptClassName,
+				'clear-button': clearButtonClassName,
+				'copy-button': copyButtonClassName,
+				'paste-button': pasteButtonClassName,
+
+				'clear-button-text': clearButtonTextClassName,
+				'copy-button-text': copyButtonTextClassName,
+				'paste-button-text': pasteButtonTextClassName,
+
+				'clear-button-img': clearButtonIconClassName,
+				'copy-button-img': copyButtonIconClassName,
+				'paste-button-img': pasteButtonIconClassName
+			
+			}=classNames;
+
+			const {
+				panel: panelId,
+				input: inputId
+
+			}=idNames;
+
+			const {
+				clear: clearIconPath,
+				copy: copyIconPath,
+				paste: pasteIconPath
+
+			}=imgPaths;
+			
+			return <section id={panelId} className={panelClassName} >
+
+				<label htmlFor={panelId} className={labelClassName}>{label}</label>
+
+				<div className={lengthTextParentClassName}>
+					
+					<hr className={hrRightClassName}/>
+					<span className={lengthTextClassName}>{lengthText}</span>
+					<hr className={hrLeftClassName}/>
+				
+				</div>
+				
+				<textarea id={panelId} className={inputClassName} type="text" onInput={onInput} value={value}></textarea>
+
+				
+				<button className={clearButtonClassName} onClick={clearCallback}>
+					<img className={clearButtonIconClassName} src={clearIconPath} />
+					<span className={clearButtonTextClassName}>Clear</span>
+				</button>
+				
+				{/*<button className={copyButtonClassName}>
+					<img className={copyButtonIconClassName} src={copyIconPath} />
+					<span className={copyButtonTextClassName}>Copy</span>
+				</button>
+
+				<button className={pasteButtonClassName}>
+					<img className={pasteButtonIconClassName} src={pasteIconPath} />
+					<span className={pasteButtonTextClassName}>Paste</span>
+				</button>*/}
+
+
+			</section>;
+		}
+		//-------  component App WITHOUT LOCAL STATE ------- //
+		class App extends React.Component{
+			constructor(props){
+				super(props);
+			}
+			componentDidMount(){
+				this.props['do-initial-onInputDecimal']('1234');
+			}
+			render(){
+				const {
+					'do-initial-onInputDecimal': doInitial,
+					'do-onInputBinary': onInputBinary,
+					'do-onInputDecimal': onInputDecimal,
+					binaryText,
+					decimalText,
+					binaryTextLength,
+					decimalTextLength,
+					'do-clear-binary': clearBinary,
+					'do-clear-decimal': clearDecimal
+				}= this.props;
+
+				//window.onload= event=> this.props['do-initial-onInputDecimal']('1234');
+
+				const classNames={
+						panel: 'panel',
+						label: 'label',
+						lengthTextParent: 'length-text-parent',
+						'hr-right': 'hr-right',
+						'hr-left': 'hr-left',
+
+						lengthText: 'length-text',
+						input: 'input',
+						subscript: 'subscript',
+						'clear-button': 'button clear-button',
+						'copy-button': 'button copy-button',
+						'paste-button': 'button paste-button',
+						
+						'clear-button-text': 'button-text clear-button-text',
+						'copy-button-text': 'button-text copy-button-text',
+						'paste-button-text': 'button-text paste-button-text',
+
+						'clear-button-img': 'icon clear-button-icon',
+						'copy-button-img': 'icon copy-button-icon',
+						'paste-button-img': 'icon paste-button-icon'
+				};
+
+				const imgPaths={
+						'clear': 'assets/xmark-solid.svg',
+						'copy': 'assets/copy-solid.svg',
+						'paste': 'assets/paste-solid.svg'
+				};
+
+				return <div id="app">
+					
+					<Panel
+
+					label="Unsigned Binary number"
+					onInput={onInputBinary}
+					clearCallback= {clearBinary}
+					
+					value= {binaryText}
+					lengthText= {binaryTextLength}
+					
+					subscript="2"
+
+					classNames={{...classNames}}
+					imgPaths={{...imgPaths}}
+					
+					idNames={{
+						panel: 'panel-binary',
+						input: 'input-binary'
+					}}
+
+					/>
+
+					<Panel
+					
+					label="Decimal number"
+					onInput={onInputDecimal}
+					clearCallback= {clearDecimal}
+					
+					value= {decimalText}
+					lengthText= {decimalTextLength}
+					
+					subscript="10"
+
+					classNames={{...classNames}}
+					imgPaths={{...imgPaths}}
+
+					idNames={{
+						panel: 'panel-decimal',
+						input: 'input-decimal'
+					}}
+					/>
+
+					{/*<ErorrMessage
+					classNames={{
+						'panel': 'error-message',
+						'header': 'error-header',
+						'button': 'error-button'
+					}}
+				/>*/}
+				</div>;
+			}
+		}
+		//-------  react component Provider -------//
+		const Provider = ReactRedux.Provider;
+		
+		//-------  connect function ------- //
+		const connect= ReactRedux.connect;
+		
+		//-------  store i.e. STATE object ------- //
+		const store= Redux.createStore(rootReducer);
+		
+
+		//-------  APP2 component ------- //
+		const App2= connect(mapStateToProps, mapDispatchToProps)(App);
+		
+		//-------  react componentAppWrapper ------- //
+		class AppWrapper extends React.Component{
+			constructor(props){
+				super(props);		
+			}
+			render(){
+				//store prop IS REQUIRED.
+				return (<Provider store={store}>
+					<App2/>
+				</Provider>);
+			}
+		}
+		//-------  put component AppWrapper in DOM ------- //
+
+		const container= document.querySelector('#react-container');
+
+		//React 18+
+		const root = ReactDOM.createRoot(container);
+		root.render(<AppWrapper/>);
+	</script>
+</body>
+<footer>
+by Abdullah Fatota
+</footer>
+</html>
