@@ -41,13 +41,231 @@
 	</main>
 	
 	<script type="text/babel">
+		//------- conversion functions -------
+		
+		/* ------- Binary to Decimal ------- */
+
+		/* array.reduce() */
+		const binaryToDecimal= binaryString=>{	
+			/*
+			avoid stack overflow of [...string0] when string0 is too big;
+			const string= [...string0].reverse().join('');
+
+			instead using that trick
+
+			if a string is 100 than indicies 012 become
+			length-1-index = 210 
+			*/
+			const lengthMinus1= BigInt(binaryString.length) - BigInt(1);
+			
+			const dec= Array.from(binaryString).reduce((acc, oldElement, oldIndex)=> {
+				
+				const zeroOrOne= BigInt(oldElement);// 0 or 1
+				const index= lengthMinus1 - BigInt(oldIndex);
+				const powerValue= BigInt(2) ** index;
+				
+				const result= acc + zeroOrOne * powerValue;
+
+				//console.log('--result=', result, 'typeof result=', typeof result);
+
+				return result;
+
+			}, BigInt(0) );
+
+			const result= dec.toString();
+	
+			return result;
+		};
+
+		/* ------- Binary to Hexadecimal ------- */
+
+		/* array.reduce();
+		group 4 bits then translate */
+		const binaryToHex= (binaryString)=> {
+			const hexNumbers= new Map();
+			
+			hexNumbers.set('0000', '0');
+			hexNumbers.set('0001', '1');
+			hexNumbers.set('0010', '2');
+			hexNumbers.set('0011', '3');
+
+			hexNumbers.set('0100', '4');
+			hexNumbers.set('0101', '5');
+			hexNumbers.set('0110', '6');
+			hexNumbers.set('0111', '7');
+
+			hexNumbers.set('1000', '8');
+			hexNumbers.set('1001', '9');
+			hexNumbers.set('1010', 'A');
+			hexNumbers.set('1011', 'B');
+
+			hexNumbers.set('1100', 'C');
+			hexNumbers.set('1101', 'D');
+			hexNumbers.set('1110', 'E');
+			hexNumbers.set('1111', 'F');
+
+			// group binary string into 4 bit chunks
+			const array= [];
+
+			for(let i=0; i< binaryString.length; i+= 4){
+				let chunk= binaryString.substring(0, 4);
+
+				//pad left with 0s is bit string <4
+				if(chunk.length < 4){
+					chunk= chunk.padEnd(4, '0');
+				}
+
+				array.push(hexNumbers.get(chunk));
+			}
+
+			const hexString= array.join('');
+			return hexString;
+		}
+		
+		/* ------- Decimal to Binary ------- */
+	
+		/*
+		repeated division by 2 algorithm
+		version 1; prepend array;
+			attach remainder value to front of array;
+			using array.unshift(r)
+		*/
+		const decimalToBinaryV1= (decimalString)=> {
+			/*division remainers*/
+			const array= [];
+
+			/*quotient mutated*/
+			let i= BigInt(decimalString);
+			
+
+			/*stop when quotient = 0*/
+			while ( i != BigInt(0) ){
+				
+				/* for BigInt; / operator is integer division? */
+				const [q, r]= [ i / BigInt(2), i % BigInt(2) ];
+				i= q;
+
+				//console.log('--q=', q, 'typeof q=', typeof q, 'r=', r, 'typeof r', typeof r);
+
+
+				/*prepend remainder*/
+				array.unshift(r);
+			}
+			
+			// join the array of BigInt 0 or 1 values;
+			const string= array.join('');
+
+			return string;
+		}
+
+		/*
+		version 2; preallocate the remainers array;
+			then simply set its positions with values
+		*/
+		const getBinaryNumberV2= (decimalString)=> {
+			/*
+			how wide should the array be?
+			
+			floor(log2(decimalNumber)) + 1
+			
+			*/
+			
+
+		}
+
+		/* ------- Decimal to Hexadecimal ------- */
+
+		/* 1. decimal to binary; repeated division by 2
+		2. binary to hexadecimal; array.reduce() group 4 bits */
+		const decimalToHexV1= (decimalString)=> {
+			
+			const binaryString= decimalToBinaryV1(decimalString);
+
+			const hexString= binaryToHex(binaryString);
+
+			return hexString;
+		}
+
+		/* ------- Hexadecimal to Binary ------- */
+
+		/* array.reduce(); convert 1 digit to 4  bits */
+		const hexToBinary =(hexString)=>{
+			const hexNumbers= new Map();
+			
+			hexNumbers.set('0', '0000');
+			hexNumbers.set('1', '0001');
+			hexNumbers.set('2', '0010');
+			hexNumbers.set('3', '0011');
+
+			hexNumbers.set('4', '0100');
+			hexNumbers.set('5', '0101');
+			hexNumbers.set('6', '0110');
+			hexNumbers.set('7', '0111');
+
+			hexNumbers.set('8', '1000');
+			hexNumbers.set('9', '1001');
+			hexNumbers.set('A', '1010');
+			hexNumbers.set('B', '1011');
+
+			hexNumbers.set('C', '1100');
+			hexNumbers.set('D', '1101');
+			hexNumbers.set('E', '1110');
+			hexNumbers.set('F', '1111');
+
+			const binaryString= hexString.map(h=> hexNumbers.get(h)).join('');
+			return binaryString;
+		};
+
+		/* ------- Hexadecimal to Decimal ------- */
+
+		/* array.reduce(); place value system */
+		const hexToDecimal= (hexString)=>{
+			const hexNumbers= new Map();
+			
+			hexNumbers.set('0', BigInt(0));
+			hexNumbers.set('1', BigInt(1));
+			hexNumbers.set('2', BigInt(2));
+			hexNumbers.set('3', BigInt(3));
+
+			hexNumbers.set('4', BigInt(4));
+			hexNumbers.set('5', BigInt(5));
+			hexNumbers.set('6', BigInt(6));
+			hexNumbers.set('7', BigInt(7));
+
+			hexNumbers.set('8', BigInt(8));
+			hexNumbers.set('9', BigInt(9));
+			hexNumbers.set('A', BigInt(10));
+			hexNumbers.set('B', BigInt(11));
+
+			hexNumbers.set('C', BigInt(12));
+			hexNumbers.set('D', BigInt(13));
+			hexNumbers.set('E', BigInt(14));
+			hexNumbers.set('F', BigInt(15));
+
+			const decimalString= hexString.reduce((acc, element, index)=>{
+				
+				const newElement= hexNumbers.get(element);
+				const placeValue= BigInt(16) ** BigInt(index);
+
+				const value=  newElement * placeValue;
+				const result= acc + value;
+
+				return result;
+
+			} , BigInt(0));
+		};
+
+	
 		//------- component App WITHOUT LOCAL STATE -------//
 
 		const state0= {
 			binaryText: '',
 			decimalText: '',
+			hexText: '',
+			
 			binaryTextLength: '',
-			decimalTextLength: ''
+			decimalTextLength: '',
+			hexTextLength: '',
 		}
 
 		/* validate textarea */
@@ -59,154 +277,84 @@
 			const {type}= action;
 
 			const EMPTY_STRING_INPUT= '';
+			
+			const EMPTY_STATE= {
+				binaryText: EMPTY_STRING_INPUT,
+				decimalText: EMPTY_STRING_INPUT,
+				hexText: EMPTY_STRING_INPUT,
+				
+				binaryTextLength: EMPTY_STRING_INPUT,
+				decimalTextLength: EMPTY_STRING_INPUT,
+				hexTextLength: EMPTY_STRING_INPUT
+			};
 
 			if(type==='inputBinary'){
-				const {text}= action;
+				const {binaryText}= action;
 
 				/* ignore invalid input */
-				if(isBinaryString(text) === false){
+				if(isBinaryString(binaryText) === false){
 					return state;
 				}
 
-				if(text === EMPTY_STRING_INPUT){
+				if(binaryText === EMPTY_STRING_INPUT){
 					return {
 						...state,
-						binaryText: EMPTY_STRING_INPUT,
-						decimalText: EMPTY_STRING_INPUT,
-						binaryTextLength: EMPTY_STRING_INPUT,
-						decimalTextLength: EMPTY_STRING_INPUT,
-					}
+						...EMPTY_STATE
+					};
 				}
 
-				/*Binary to Decimal*/
-
-				const getdecimal= string=>{
-					
-					//const pow= Math.pow; //not needed bec. ** operator
-
-					
-					
-					/*
-					avoid stack overflow of [...string0] when
-					string0 is too big;
-
-					instead using below trick
-
-					if a string is 100 with indicies 012 then
-					length-1-index is 210 
-					*/
-					//const string= [...string0].reverse().join('');
-					const lengthMinus1= BigInt(string.length) - BigInt(1);
-					
-					const dec= Array.from(string).reduce((acc, oldElement, oldIndex)=> {
-						
-						const zeroOrOne= BigInt(oldElement);// 0 or 1
-						const index= lengthMinus1 - BigInt(oldIndex);
-						const powerValue= BigInt(2) ** index;
-						
-						const result= acc + zeroOrOne * powerValue;
-
-						//console.log('--result=', result, 'typeof result=', typeof result);
-
-						return result;
-
-					}, BigInt(0) );
-			
-					return dec;
-				};
-
-				const dec= getdecimal(text).toString();
+				const decimalText= binaryToDecimal(binaryText);
+				const hexText= binaryToHex(binaryText);
 				
 
 				//console.log('---', text);
 				return {
 					...state,
-					binaryText: text,
-					decimalText: dec,
-					binaryTextLength: `${text.length} bits long`,
-					decimalTextLength: `${dec.length} digits long`,
+					binaryText: binaryText,
+					decimalText: decimalText,
+					hexText: hexText,
+					
+					binaryTextLength: `${binaryText.length} bits long`,
+					decimalTextLength: `${decimalText.length} digits long`,
+					hexTextLength: `${hexText.length} digits long`
 				};
 			}
+			
 			else if(type==='inputDecimal'){
-				const {text}= action;
+				const {decimalText}= action;
 
 				/* ignore invalid input */
-				if(isDecimalString(text) === false){
+				if(isDecimalString(decimalText) === false){
 					return state;
 				}
 
-				/*
-				Decimal to Binary
-				using the repeated division by 2 algorithm
-				*/
-				
-				/*
-				version 1; prepend array;
-					attach remainer value to front of array;
-					use array.unshift(r)
-				*/
-				const getBinaryNumberV1= (decimalString)=> {
-					/*division remainers*/
-					const array= [];
-
-					/*quotient mutated*/
-					let i= BigInt(decimalString);
-					
-
-					/*stop when quotient = 0*/
-					while ( i != BigInt(0) ){
-						
-						/* for BigInt; / operator is integer division? */
-						const [q, r]= [ i / BigInt(2), i % BigInt(2) ];
-						i= q;
-
-						//console.log('--q=', q, 'typeof q=', typeof q, 'r=', r, 'typeof r', typeof r);
-
-
-						/*prepend remainder*/
-						array.unshift(r);
-					}
-					
-					// join the array of BigInt 0 or 1 values;
-					const string= array.join('');
-
-					return string;
+				if(decimalText === EMPTY_STRING_INPUT){
+					return {
+						...state,
+						...EMPTY_STATE
+					};
 				}
 
-				/*
-				version 2; preallocate the remainers array;
-					then simply set its positions with values
-				*/
-				const getBinaryNumberV2= (decimalString)=> {
-					/*
-					how wide should the array be?
-					
-					floor(log2(decimalNumber)) + 1
-					
-					*/
-					
-
-				}
-
-				const bin= getBinaryNumberV1(text);
+				const binaryText= decimalToBinaryV1(decimalText);
+				const hexText= decimalToHexV1(decimalText);
 
 				//console.log('---', text);
 				return {
 					...state,
-					binaryText: bin,
-					decimalText: text,
-					binaryTextLength: `${bin.length} bits long`,
-					decimalTextLength: `${text.length} digits long`,
+					binaryText: binaryText,
+					decimalText: decimalText,
+					hexText: hexText,
+
+					binaryTextLength: `${binaryText.length} bits long`,
+					decimalTextLength: `${decimalText.length} digits long`,
+					hexTextLength: `${hexText.length} digits long`
 				};
 			}
 			else if(type==='clear-binary' || type==='clear-decimal'){
 				return {
-					...state,
-					binaryText: EMPTY_STRING_INPUT,
-					decimalText: EMPTY_STRING_INPUT,
-					binaryTextLength: EMPTY_STRING_INPUT,
-					decimalTextLength: EMPTY_STRING_INPUT,
-				}
+						...state,
+						...EMPTY_STATE
+					};
 			}
 			else{
 				return {...state};
@@ -218,11 +366,11 @@
 
 		//-------  map dispat=ch to props ------- //
 		const mapDispatchToProps= dispatchFunction=>({
-			'do-onInputBinary': event=> dispatchFunction({type: 'inputBinary', text: event.target.value}),
-			'do-onInputDecimal': event=> dispatchFunction({type: 'inputDecimal', text: event.target.value}),
+			'do-onInputBinary': event=> dispatchFunction({type: 'inputBinary', binaryText: event.target.value}),
+			'do-onInputDecimal': event=> dispatchFunction({type: 'inputDecimal', decimalText: event.target.value}),
 			
 			/* set initial decimal value*/
-			'do-initial-onInputDecimal': string=> dispatchFunction({type: 'inputDecimal', text: string}),
+			'do-initial-onInputDecimal': string=> dispatchFunction({type: 'inputDecimal', decimalText: string}),
 
 			'do-clear-binary': event=> dispatchFunction({type: 'clear-binary'}),
 			'do-clear-decimal': event=> dispatchFunction({type: 'clear-decimal'}),
@@ -356,8 +504,12 @@
 					'do-onInputDecimal': onInputDecimal,
 					binaryText,
 					decimalText,
+					hexText,
+
 					binaryTextLength,
 					decimalTextLength,
+					hexTextLength,
+
 					'do-clear-binary': clearBinary,
 					'do-clear-decimal': clearDecimal
 				}= this.props;
@@ -424,6 +576,26 @@
 					
 					value= {decimalText}
 					lengthText= {decimalTextLength}
+					
+					subscript="10"
+
+					classNames={{...classNames}}
+					imgPaths={{...imgPaths}}
+
+					idNames={{
+						panel: 'panel-decimal',
+						input: 'input-decimal'
+					}}
+					/>
+
+					<Panel
+					
+					label="Hexadecimal number"
+					onInput={onInputDecimal}
+					clearCallback= {clearDecimal}
+					
+					value= {hexText}
+					lengthText= {hexTextLength}
 					
 					subscript="10"
 
