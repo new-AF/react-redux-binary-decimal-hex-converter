@@ -81,7 +81,7 @@
 
 		/* array.reduce();
 		group 4 bits then translate */
-		const binaryToHex= (binaryString0)=> {
+		const binaryToHex= (oldSinaryString1)=> {
 			const hexNumbers= new Map();
 			
 			hexNumbers.set('0000', '0');
@@ -107,12 +107,16 @@
 			/* group binary string into 4 bit chunks */
 			const array= [];
 
-			// console.log('*** binaryToHex ***', 'binaryString0= ', binaryString0);
+			// console.log('*** binaryToHex ***', 'oldSinaryString1= ', oldSinaryString1);
 			
+			/* user's binary input string can have leading 0s;
+			therefore remove them */
+			const oldSinaryString2= oldSinaryString1.replace(/^0+([01]+)$/, '$1');
+
 			/*
-			important; translate binary string from right to left
+			important; translate unpadded binary string from RIGHT to LEFT
 			*/
-			let length= binaryString0.length;
+			let length= oldSinaryString2.length;
 
 			/*
 			- if the string is not a multiple of 4;
@@ -122,7 +126,7 @@
 			do nothing and return empty string
 			*/
 			const missing= (length % 4 === 0) ? 0 : (4 - length % 4);
-			const binaryString= binaryString0.padStart(length + missing, '0');
+			const binaryString= oldSinaryString2.padStart(length + missing, '0');
 
 			const newLength= binaryString.length;
 			
@@ -246,7 +250,15 @@
 
 			// console.log('*** hexToBinary, hexString=', hexString);
 			
-			const binaryString= Array.from(hexString).map(h=> hexNumbers.get(h)).join('');
+
+
+			const oldBinaryString= Array.from(hexString).map(h=> hexNumbers.get(h)).join('');
+
+			/* remove leading 0s from final binaryString
+			which are AT MOST 3 bits; because hexString
+			doesn't have leading 0s */
+			const binaryString= oldBinaryString.replace(/^0+(.+)$/, '$1');
+
 
 			// console.log('--- binaryString=', binaryString);
 
