@@ -81,7 +81,7 @@
 
 		/* array.reduce();
 		group 4 bits then translate */
-		const binaryToHex= (binaryString)=> {
+		const binaryToHex= (binaryString0)=> {
 			const hexNumbers= new Map();
 			
 			hexNumbers.set('0000', '0');
@@ -107,15 +107,33 @@
 			// group binary string into 4 bit chunks
 			const array= [];
 
-			for(let i=0; i< binaryString.length; i+= 4){
-				let chunk= binaryString.substring(0, 4);
+			console.log('*** binaryToHex ***', 'binaryString0= ', binaryString0);
+			// important; translate binary string from right to left
 
-				//pad left with 0s is bit string <4
-				if(chunk.length < 4){
-					chunk= chunk.padEnd(4, '0');
-				}
+			let length= binaryString0.length;
 
-				array.push(hexNumbers.get(chunk));
+			/*
+			- if the string is not a multiple of 4;
+			left-pad it.
+			
+			- if binaryString0='' then pad with 4
+			*/
+			const missing= length === 0 ? 4 : ((length % 4 === 0) ? 0 : (4 - length % 4));
+			const binaryString= binaryString0.padStart(length + missing, '0');
+
+			const newLength= binaryString.length;
+			
+
+			for(let i=0; i< newLength; i+= 4){
+				let chunk= binaryString.substring(i, i+4);
+
+				console.log('-- chunk=', chunk);
+
+				const value= hexNumbers.get(chunk);
+
+				array.push(value);
+
+				console.log('--value=', value);
 			}
 
 			const hexString= array.join('');
@@ -131,13 +149,22 @@
 			using array.unshift(r)
 		*/
 		const decimalToBinaryV1= (decimalString)=> {
-			/*division remainers*/
+			/*
+			- division remainers
+			*/
 			const array= [];
 
 			/*quotient mutated*/
 			let i= BigInt(decimalString);
-			
 
+			/*
+			- if decimalString='0' then
+			while loop will NOT run;
+			*/
+			if(i === BigInt(0)){
+				array.unshift(BigInt(0));
+			}
+			
 			/*stop when quotient = 0*/
 			while ( i != BigInt(0) ){
 				
@@ -495,7 +522,7 @@
 				super(props);
 			}
 			componentDidMount(){
-				this.props['do-initial-onInputDecimal']('1234');
+				this.props['do-initial-onInputDecimal']('256');
 			}
 			render(){
 				const {
