@@ -116,9 +116,10 @@
 			- if the string is not a multiple of 4;
 			left-pad it.
 			
-			- if binaryString0='' then pad with 4
+			- if binaryString0='' then
+			do nothing and return empty string
 			*/
-			const missing= length === 0 ? 4 : ((length % 4 === 0) ? 0 : (4 - length % 4));
+			const missing= (length % 4 === 0) ? 0 : (4 - length % 4);
 			const binaryString= binaryString0.padStart(length + missing, '0');
 
 			const newLength= binaryString.length;
