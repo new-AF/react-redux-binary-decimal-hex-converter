@@ -220,7 +220,7 @@
 
 		/* ------- Hexadecimal to Binary ------- */
 
-		/* array.reduce(); convert 1 digit to 4  bits */
+		/* array.map(); convert 1 digit to 4  bits */
 		const hexToBinary =(hexString)=>{
 			const hexNumbers= new Map();
 			
@@ -244,7 +244,12 @@
 			hexNumbers.set('E', '1110');
 			hexNumbers.set('F', '1111');
 
-			const binaryString= hexString.map(h=> hexNumbers.get(h)).join('');
+			// console.log('*** hexToBinary, hexString=', hexString);
+			
+			const binaryString= Array.from(hexString).map(h=> hexNumbers.get(h)).join('');
+
+			// console.log('--- binaryString=', binaryString);
+
 			return binaryString;
 		};
 
@@ -252,6 +257,8 @@
 
 		/* array.reduce(); place value system */
 		const hexToDecimal= (hexString)=>{
+
+			/* if string is lower case; dictionary lookup fails */
 			const hexNumbers= new Map();
 			
 			hexNumbers.set('0', BigInt(0));
@@ -274,8 +281,13 @@
 			hexNumbers.set('E', BigInt(14));
 			hexNumbers.set('F', BigInt(15));
 
-			const decimalString= hexString.reduce((acc, element, index)=>{
+			/* avoid [...hexString].reverse().join('') */
+			const lengthMinus1= BigInt(hexString.length-1);
+
+			/* place values strat from right to left */
+			const decimalString= Array.from(hexString).reduce((acc, element, oldIndex)=>{
 				
+				const index= lengthMinus1- BigInt(oldIndex);
 				const newElement= hexNumbers.get(element);
 				const placeValue= BigInt(16) ** BigInt(index);
 
@@ -285,6 +297,8 @@
 				return result;
 
 			} , BigInt(0));
+
+			return decimalString.toString();
 		};
 
 	
@@ -351,7 +365,50 @@
 					hexTextLength: `${hexText.length} digits long`
 				};
 			}
-			
+			else if(type==='input-hex'){
+				/* 
+				accepts empty string
+				and hex numbers
+				*/
+				const isHexString= string=> /^[\da-fA-F]*$/.test(string);
+
+				const {hexText}= action;
+
+				/* 
+				ignore invalid input
+				*/
+				if(isHexString(hexText)===false){
+					return {...state};
+				}
+
+				/* 
+				if empty string; clear all panels
+				*/
+				if(hexText === EMPTY_STRING_INPUT){
+					return {
+						...state,
+						...EMPTY_STATE
+					};
+				}
+
+				const binaryText= hexToBinary(hexText);
+				// console.log('!!binaryText= ',binaryText);
+
+				const decimalText= hexToDecimal(hexText);
+				// console.log('!!decimalText= ',decimalText);
+
+				return {
+					...state,
+					binaryText: binaryText,
+					decimalText: decimalText,
+					hexText: hexText,
+
+					binaryTextLength: `${binaryText.length} bits long`,
+					decimalTextLength: `${decimalText.length} digits long`,
+					hexTextLength: `${hexText.length} digits long`
+				};
+
+			}
 			else if(type==='inputDecimal'){
 				const {decimalText}= action;
 
@@ -382,7 +439,7 @@
 					hexTextLength: `${hexText.length} digits long`
 				};
 			}
-			else if(type==='clear-binary' || type==='clear-decimal'){
+			else if(type==='clear-binary' || type==='clear-decimal' || type==='clear-hex'){
 				return {
 						...state,
 						...EMPTY_STATE
@@ -398,14 +455,19 @@
 
 		//-------  map dispat=ch to props ------- //
 		const mapDispatchToProps= dispatchFunction=>({
-			'do-onInputBinary': event=> dispatchFunction({type: 'inputBinary', binaryText: event.target.value}),
-			'do-onInputDecimal': event=> dispatchFunction({type: 'inputDecimal', decimalText: event.target.value}),
 			
 			/* set initial decimal value*/
 			'do-initial-onInputDecimal': string=> dispatchFunction({type: 'inputDecimal', decimalText: string}),
 
+			'do-onInputBinary': event=> dispatchFunction({type: 'inputBinary', binaryText: event.target.value}),
+			'do-onInputDecimal': event=> dispatchFunction({type: 'inputDecimal', decimalText: event.target.value}),
+			
+			/* returned string must be  UPPER CASE */
+			'do-onInputHex': event=> dispatchFunction({type: 'input-hex', hexText: event.target.value.toUpperCase()}),
+
 			'do-clear-binary': event=> dispatchFunction({type: 'clear-binary'}),
 			'do-clear-decimal': event=> dispatchFunction({type: 'clear-decimal'}),
+			'do-clear-hex': event=> dispatchFunction({type: 'clear-hex'})
 		});
 		//-------  components ------- //
 		const ErorrMessage= (props)=>{
