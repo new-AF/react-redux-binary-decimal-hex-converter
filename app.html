@@ -104,12 +104,14 @@
 			hexNumbers.set('1110', 'E');
 			hexNumbers.set('1111', 'F');
 
-			// group binary string into 4 bit chunks
+			/* group binary string into 4 bit chunks */
 			const array= [];
 
-			console.log('*** binaryToHex ***', 'binaryString0= ', binaryString0);
-			// important; translate binary string from right to left
-
+			// console.log('*** binaryToHex ***', 'binaryString0= ', binaryString0);
+			
+			/*
+			important; translate binary string from right to left
+			*/
 			let length= binaryString0.length;
 
 			/*
@@ -128,13 +130,13 @@
 			for(let i=0; i< newLength; i+= 4){
 				let chunk= binaryString.substring(i, i+4);
 
-				console.log('-- chunk=', chunk);
+				// console.log('-- chunk=', chunk);
 
 				const value= hexNumbers.get(chunk);
 
 				array.push(value);
 
-				console.log('--value=', value);
+				// console.log('--value=', value);
 			}
 
 			const hexString= array.join('');
@@ -203,8 +205,10 @@
 
 		/* ------- Decimal to Hexadecimal ------- */
 
-		/* 1. decimal to binary; repeated division by 2
-		2. binary to hexadecimal; array.reduce() group 4 bits */
+		/*
+		1. do decimal to binary; repeated division by 2
+		2. do binary to hexadecimal; chunk 4bits then translate
+		*/
 		const decimalToHexV1= (decimalString)=> {
 			
 			const binaryString= decimalToBinaryV1(decimalString);
@@ -530,6 +534,12 @@
 					'do-initial-onInputDecimal': doInitial,
 					'do-onInputBinary': onInputBinary,
 					'do-onInputDecimal': onInputDecimal,
+					'do-onInputHex': onInputHex,
+
+					'do-clear-binary': clearBinary,
+					'do-clear-decimal': clearDecimal,
+					'do-clear-hex': clearHex,
+
 					binaryText,
 					decimalText,
 					hexText,
@@ -538,8 +548,7 @@
 					decimalTextLength,
 					hexTextLength,
 
-					'do-clear-binary': clearBinary,
-					'do-clear-decimal': clearDecimal
+
 				}= this.props;
 
 				//window.onload= event=> this.props['do-initial-onInputDecimal']('1234');
@@ -593,7 +602,26 @@
 						panel: 'panel-binary',
 						input: 'input-binary'
 					}}
+					/>
 
+					<Panel
+					
+					label="Hexadecimal number"
+					onInput={onInputHex}
+					clearCallback= {clearHex}
+					
+					value= {hexText}
+					lengthText= {hexTextLength}
+					
+					subscript="10"
+
+					classNames={{...classNames}}
+					imgPaths={{...imgPaths}}
+
+					idNames={{
+						panel: 'panel-hex',
+						input: 'input-hex'
+					}}
 					/>
 
 					<Panel
@@ -616,25 +644,7 @@
 					}}
 					/>
 
-					<Panel
 					
-					label="Hexadecimal number"
-					onInput={onInputDecimal}
-					clearCallback= {clearDecimal}
-					
-					value= {hexText}
-					lengthText= {hexTextLength}
-					
-					subscript="10"
-
-					classNames={{...classNames}}
-					imgPaths={{...imgPaths}}
-
-					idNames={{
-						panel: 'panel-decimal',
-						input: 'input-decimal'
-					}}
-					/>
 
 					{/*<ErorrMessage
 					classNames={{
