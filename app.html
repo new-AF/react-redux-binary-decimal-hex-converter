@@ -372,14 +372,20 @@
 				*/
 				const isHexString= string=> /^[\da-fA-F]*$/.test(string);
 
-				const {hexText}= action;
+				const {hexText: oldHexText}= action;
 
 				/* 
 				ignore invalid input
 				*/
-				if(isHexString(hexText)===false){
+				if(isHexString(oldHexText)===false){
 					return {...state};
 				}
+				/* ignore leading 0s
+				'+' makes all the difference
+				it will NOT replace the string '0' with '';
+				the leading 0 needs at least 1 MORE digit. 
+				*/
+				const hexText= oldHexText.replace(/^0+(.+)$/, '$1');
 
 				/* 
 				if empty string; clear all panels
@@ -410,12 +416,15 @@
 
 			}
 			else if(type==='inputDecimal'){
-				const {decimalText}= action;
+				const {decimalText: oldDecimalText}= action;
 
 				/* ignore invalid input */
-				if(isDecimalString(decimalText) === false){
+				if(isDecimalString(oldDecimalText) === false){
 					return state;
 				}
+				
+				/* ignore leading 0s */
+				const decimalText= oldDecimalText.replace(/^0+(.+)$/, '$1');
 
 				if(decimalText === EMPTY_STRING_INPUT){
 					return {
