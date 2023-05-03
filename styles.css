@@ -1,18 +1,18 @@
 :root {
     /* #app */
-    --app-border: medium solid snow;
+    --app-border: medium solid black;
 
-    --app-text-color: snow;
+    --app-text-color: black;
 
     /* .input */
 
-    --input-text-color: snow;
+    --input-text-color: black;
 
     --input-transition: all 200ms;
     
     /* .panel */
 
-    --panel-hover-brightness: brightness(1.175);
+    --panel-hover-brightness: brightness(1.075);
 
     --panel-transition: all 200ms;
 
@@ -42,7 +42,8 @@
 }
 
 body {
-    background-image: linear-gradient(to right bottom, #2f4f4f, #096056, #007052, #007e41, #228b22);
+    /* background-image: linear-gradient(to right bottom, #2f4f4f, #096056, #007052, #007e41, #228b22); */
+    background-color: wheat;
     min-height: 100vh;
 
     display: grid;
@@ -144,7 +145,7 @@ main {
     grid-column: 3;
     grid-row: 2;
 
-    --border-color: rgba(255, 255, 255, 0.75);
+    --border-color: rgba(0, 0, 0, 0.5);
 
     border: none;
     border-top: medium solid var(--border-color);
@@ -156,7 +157,7 @@ main {
     grid-column: 1;
     grid-row: 2;
 
-    --border-color: rgba(255, 255, 255, 0.75);
+    --border-color: rgba(0, 0, 0, 0.5);
 
     border: none;
     border-top: medium solid var(--border-color);
@@ -166,7 +167,7 @@ main {
 }
 /*textarea*/
 .input {
-    --border-color: rgba(255, 255, 255, 0.75);
+    --border-color: rgba(0, 0, 0, 0.5);
     --border-style: solid;
 
     resize: none;
@@ -200,7 +201,7 @@ main {
     
     --border-style: solid;
     
-    --border-color: rgba(255, 255, 255, 0.75);
+    /* --border-color: rgba(0, 0, 0, 1); */
 
 
     /* border-left: medium var(--border-style) var(--border-color); */
@@ -252,7 +253,7 @@ main {
     grid-row: 1;
 
     width: 2rem;
-    filter: invert(0.9);
+    /* filter: invert(0.9); */
 }
 .button-text {
     grid-column: 1;
