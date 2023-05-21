@@ -2,18 +2,18 @@
 
 App to convert
 
-- binary to decimal.
-- binary to hexadecimal.
+- binary numbers to decimal.
+- binary numbers to hexadecimal.
 
 and
 
-- decimal to binary.
-- decimal to hexadecimal.
+- decimal numbers to binary.
+- decimal numbers to hexadecimal.
 
 and
 
-- hexadecimal to binary.
-- hexadecimal to decimal.
+- hexadecimal numbers to binary.
+- hexadecimal numbers to decimal.
 
 [Select the project and try it live!](https://new-af.github.io/)
 
