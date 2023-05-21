@@ -17,4 +17,4 @@ and
 
 [Select the project and try it live!](https://new-af.github.io/)
 
-<img src="1 react redux 4 binary hex decimal.png" alt="preview image of live app"/>
+<img src="assets/1 react redux 4 binary hex decimal.png" alt="preview image of live app"/>
