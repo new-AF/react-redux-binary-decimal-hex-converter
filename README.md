@@ -1,20 +1,19 @@
 # Unsigned Binary - Hexadecimal - Decimal number converter
 
-App to convert
+## Convert between number notations:
 
-- binary numbers to decimal.
-- binary numbers to hexadecimal.
+-   Unsigned Binary and Decimal.
 
-and
+---
 
-- decimal numbers to binary.
-- decimal numbers to hexadecimal.
+-   Unsigned Binary and Hexadecimal.
 
-and
+---
 
-- hexadecimal numbers to binary.
-- hexadecimal numbers to decimal.
+-   Decimal and Hexadecimal.
 
-[Select the project and try it live!](https://new-af.github.io/)
+---
 
-<img src="assets/1 react redux 4 binary hex decimal.png" alt="preview image of live app"/>
+[Run the App!](https://new-af.github.io/)
+
+<img src="assets/preview.png" alt="preview image of live app"/>
